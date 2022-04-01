@@ -16,16 +16,16 @@
         <scala.version>2.12</scala.version>
     </properties>
 
-    <!-- 配置镜像源-->
     <repositories>
         <repository>
             <id>alimaven</id>
-            <url>https://maven.aliyun.com/repository/central</url>
+            <name>aliyun maven</name>
+            <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
             <snapshots>
-                <enabled>true</enabled>
+                <enabled>false</enabled>
             </snapshots>
         </repository>
 
@@ -35,17 +35,41 @@
         </repository>
     </repositories>
 
-
     <dependencies>
+        <!-- maven 仓库：https://mvnrepository.com/ -->
+        <!-- FLink Java 相关依赖-->
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-java</artifactId>
             <version>${flink.version}</version>
+            <!-- <scope>provided</scope>-->
         </dependency>
 
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-streaming-java_${scala.version}</artifactId>
+            <version>${flink.version}</version>
+            <!-- <scope>provided</scope>-->
+        </dependency>
+
+        <!-- FLink Scala 相关依赖-->
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-scala_${scala.version}</artifactId>
+            <version>${flink.version}</version>
+            <!-- <scope>provided</scope>-->
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-streaming-scala_${scala.version}</artifactId>
+            <version>${flink.version}</version>
+            <!-- <scope>provided</scope>-->
+        </dependency>
+
+        <!-- 从Flink1.11开始，移除了flink-streaming-java对flink-clients的依赖，需要手动加入clients依赖 -->
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-clients_${scala.version}</artifactId>
             <version>${flink.version}</version>
         </dependency>
 

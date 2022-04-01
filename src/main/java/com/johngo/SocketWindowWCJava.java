@@ -5,11 +5,9 @@ import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.api.windowing.assigners.SlidingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.assigners.SlidingProcessingTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.util.Collector;
-import scala.Tuple2;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -31,8 +29,8 @@ public class SocketWindowWCJava {
         int port = 8899;
         String delimiter = "\n";
         // 获取数据源(Socket数据源,单词以逗号分割)
-        DataStreamSource<String> text = env.socketTextStream(hostname, port, delimiter);
-        SingleOutputStreamOperator<WC> res = text.flatMap(new FlatMapFunction<String, WC>() {
+        DataStreamSource<String> source = env.socketTextStream(hostname, port, delimiter);
+        SingleOutputStreamOperator<WC> res = source.flatMap(new FlatMapFunction<String, WC>() {
 
                     @Override
                     public void flatMap(String value, Collector<WC> out) throws Exception {
@@ -51,10 +49,7 @@ public class SocketWindowWCJava {
                     }
                 });
 
-        SimpleDateFormat sdf = new SimpleDateFormat();
-        sdf.applyPattern("yyyy-MM-dd HH:mm:ss");
-        Date current = new Date();
-        res.print("date:"+sdf.format(current)).setParallelism(1);
+        res.print().setParallelism(1);
 
         env.execute("SocketWindowWCJava");
     }
