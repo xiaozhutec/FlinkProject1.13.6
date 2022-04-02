@@ -1,4 +1,4 @@
-package com.johngo;
+package com.johngo.streaming;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.ReduceFunction;
@@ -29,8 +29,8 @@ public class SocketWindowWCJava {
         int port = 8899;
         String delimiter = "\n";
         // 获取数据源(Socket数据源,单词以逗号分割)
-        DataStreamSource<String> source = env.socketTextStream(hostname, port, delimiter);
-        SingleOutputStreamOperator<WC> res = source.flatMap(new FlatMapFunction<String, WC>() {
+        DataStreamSource<String> text = env.socketTextStream(hostname, port, delimiter);
+        SingleOutputStreamOperator<WC> res = text.flatMap(new FlatMapFunction<String, WC>() {
 
                     @Override
                     public void flatMap(String value, Collector<WC> out) throws Exception {
@@ -49,7 +49,7 @@ public class SocketWindowWCJava {
                     }
                 });
 
-        res.print().setParallelism(1);
+        res.print("data: ").setParallelism(1);
 
         env.execute("SocketWindowWCJava");
     }

@@ -1,4 +1,4 @@
-package com.johngo
+package com.johngo.streaming
 
 import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
 import org.apache.flink.streaming.api.windowing.assigners.SlidingProcessingTimeWindows
@@ -20,21 +20,20 @@ object SocketWindowWCScala {
     val hostname = "localhost"
     val port = 8899
     val delimiter = '\n'
-    val source = env.socketTextStream(hostname, port, delimiter)
+    val text = env.socketTextStream(hostname, port, delimiter)
 
     import org.apache.flink.api.scala._
     // 数据格式：word,word2,word3
-    val res = source.flatMap(line => line.split(',')) // 将每一行按照逗号打平
+    val res = text.flatMap(line => line.split(',')) // 将每一行按照逗号打平
       .map(word => WC(word, 1))
       .keyBy(x => x.word)
       .window(SlidingProcessingTimeWindows.of(Time.seconds(1), Time.seconds(2)))
       .reduce((v1, v2) => WC(v1.word, v1.count + v2.count))
 
-    res.print().setParallelism(1)
+    res.print("data: ").setParallelism(1)
 
     env.execute("SocketWindowWCScala")
   }
 
   case class WC(word: String, count: Long)
-
 }
