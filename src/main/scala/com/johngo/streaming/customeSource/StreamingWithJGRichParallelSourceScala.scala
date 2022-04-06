@@ -19,6 +19,7 @@ object StreamingWithJGRichParallelSourceScala {
       line
     })
 
+
     recieveData.print("接收到的数据：")
 
     env.execute("StreamingWithJGParalleSourceScala")
