@@ -1,0 +1,8 @@
+com/johngo/batch/WordCountJava$JGFlatMapFunction.class
+com/johngo/sql/WordCountWithSQLJava$WC.class
+com/johngo/streaming/SocketWindowWCJava$2.class
+com/johngo/sql/WordCountWithSQLJava.class
+com/johngo/streaming/SocketWindowWCJava.class
+com/johngo/batch/WordCountJava.class
+com/johngo/streaming/SocketWindowWCJava$1.class
+com/johngo/streaming/SocketWindowWCJava$WC.class

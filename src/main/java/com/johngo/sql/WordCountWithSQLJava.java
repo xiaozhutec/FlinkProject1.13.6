@@ -1,14 +1,13 @@
 package com.johngo.sql;
 
-import org.apache.flink.streaming.api.datastream.DataStream;
-import org.apache.flink.streaming.api.datastream.DataStreamSource;
+import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.apache.flink.types.Row;
+import org.apache.flink.util.Collector;
 
-
-import java.util.ArrayList;
 
 /**
  * @author Johngo
@@ -20,28 +19,27 @@ public class WordCountWithSQLJava {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         StreamTableEnvironment tableEnv = StreamTableEnvironment.create(env);
 
-        // 创建一个数据集合
-        String names = "Flink,Spark,Hadoop,Spark,Flink,FLink,Scala";
-        ArrayList<WC> name = new ArrayList<>();
-        String[] splits = names.split(",");
-        for(String split: splits) {
-            name.add(new WC(split, 1L));
-        }
+        SingleOutputStreamOperator<WC> dataStream = env.socketTextStream("localhost", 8899)
+                .flatMap(new FlatMapFunction<String, WC>() {
+            @Override
+            public void flatMap(String value, Collector<WC> out) throws Exception {
+                String[] splits = value.split(",");
+                for (String split : splits) {
+                    out.collect(new WC(split, 1L));
+                }
+            }
+        });
 
-        DataStreamSource<WC> dataStream = env.fromCollection(name);
-        //DataSet 转sql, 指定字段名
-        Table inputTable = tableEnv.fromDataStream(dataStream).as("name", "cnt");
-        inputTable.printSchema();
+        //DataStream 转sql & 查询
+        Table WordCountTable = tableEnv.fromDataStream(dataStream);
+        WordCountTable.printSchema();
+        tableEnv.createTemporaryView("WC", WordCountTable);
 
-        // 注册表为视图 & 查询
-        tableEnv.createTemporaryView("InputTable", inputTable);
-        Table resultTable = tableEnv.sqlQuery("SELECT name, SUM(cnt) FROM InputTable GROUP BY name");
+        Table resultTable = tableEnv.sqlQuery("SELECT word, SUM(`count`) FROM WC group by word");
 
-        // 将结果数据转换为DataStream
-        DataStream<Row> resultStream = tableEnv.toChangelogStream(resultTable);
-
-        resultStream.print();
-        env.execute();
+        // 将结果数据转换为DataStream toRetractStream toAppendStream
+        tableEnv.toRetractStream(resultTable, Row.class).print().setParallelism(1);
+        env.execute("WCSQLJava");
     }
 
 
@@ -56,7 +54,7 @@ public class WordCountWithSQLJava {
         }
         @Override
         public String toString() {
-            return "WordWithCount{" +
+            return "WC {" +
                     "word='" + word + '\'' +
                     ", count=" + count +
                     '}';

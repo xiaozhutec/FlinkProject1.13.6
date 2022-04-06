@@ -9,8 +9,6 @@ import org.apache.flink.streaming.api.windowing.assigners.SlidingProcessingTimeW
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.util.Collector;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  * Flink 对数据进行wc计算
