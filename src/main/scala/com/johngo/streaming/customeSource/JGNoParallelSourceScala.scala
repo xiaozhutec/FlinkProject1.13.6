@@ -7,7 +7,7 @@ import org.apache.flink.streaming.api.functions.source.SourceFunction
  * @date 2022/4/6
  */
 
-private class JGNoParallelSourceScala extends SourceFunction[Long] {
+class JGNoParallelSourceScala extends SourceFunction[Long] {
   var count = 1L
   var isRunning = true
 

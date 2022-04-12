@@ -8,7 +8,7 @@ import org.apache.flink.streaming.api.functions.source.{RichParallelSourceFuncti
  * @date 2022/4/6
  */
 
-private class JGRichParallelSourceScala extends RichParallelSourceFunction[Long]{
+public class JGRichParallelSourceScala extends RichParallelSourceFunction[Long]{
   var count = 1L
   var isRunning = true
 
